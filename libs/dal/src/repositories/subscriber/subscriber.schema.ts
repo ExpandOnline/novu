@@ -22,7 +22,6 @@ const subscriberSchema = new Schema<SubscriberDBModel>(
     phone: Schema.Types.String,
     subscriberId: Schema.Types.String,
     email: Schema.Types.String,
-    tool: Schema.Types.String,
     avatar: Schema.Types.String,
     locale: Schema.Types.String,
     channels: [Schema.Types.Mixed],

@@ -9,7 +9,6 @@ export interface ISubscriberPayload {
   firstName?: string;
   lastName?: string;
   email?: string;
-  tool?: string;
   phone?: string;
   avatar?: string;
   locale?: string;

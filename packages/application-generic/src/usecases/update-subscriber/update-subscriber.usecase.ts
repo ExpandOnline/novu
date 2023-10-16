@@ -37,10 +37,6 @@ export class UpdateSubscriber {
       updatePayload.email = command.email;
     }
 
-    if (command.tool !== undefined) {
-      updatePayload.tool = command.tool;
-    }
-
     if (command.phone != null) {
       updatePayload.phone = command.phone;
     }

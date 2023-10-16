@@ -13,11 +13,6 @@ export class UpdateSubscriberRequestDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  tool?: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
   firstName?: string;
 
   @ApiProperty()
