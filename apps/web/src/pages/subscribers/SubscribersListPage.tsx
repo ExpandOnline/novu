@@ -28,10 +28,6 @@ const columns: IExtendedColumn<ISubscriber>[] = [
     Header: 'Email',
   },
   {
-    accessor: 'tool',
-    Header: 'Tool',
-  },
-  {
     accessor: 'phone',
     Header: 'Phone',
   },

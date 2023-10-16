@@ -15,8 +15,6 @@ export class SubscriberEntity {
 
   email: string;
 
-  tool?: string;
-
   phone?: string;
 
   avatar?: string;

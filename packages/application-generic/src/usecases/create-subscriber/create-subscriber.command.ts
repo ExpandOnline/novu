@@ -22,10 +22,6 @@ export class CreateSubscriberCommand extends EnvironmentCommand {
   email?: string;
 
   @IsString()
-  //@IsOptional()
-  tool?: string;
-
-  @IsString()
   @IsOptional()
   firstName?: string;
 

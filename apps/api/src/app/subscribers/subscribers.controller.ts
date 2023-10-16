@@ -182,7 +182,6 @@ export class SubscribersController {
         firstName: body.firstName,
         lastName: body.lastName,
         email: body.email,
-        tool: body.tool,
         phone: body.phone,
         avatar: body.avatar,
         locale: body.locale,
