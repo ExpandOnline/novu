@@ -6,7 +6,11 @@
           "name": "ws",
           "image": "${REPO_WS}:$GIT_COMMIT",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
+          "links": [
+            "redis",
+            "mongodb"
+          ],
           "portMappings": [
               {
                   "containerPort": 3002,
@@ -26,7 +30,7 @@
               },
               {
                   "name": "MONGO_URL",
-                  "value": "mongodb://18.194.167.222:27017/novu-db"
+                  "value": "mongodb://mongodb:27017/novu-db"
               },
               {
                   "name": "WS_CONTEXT_PATH",
@@ -62,14 +66,15 @@
               "options": {
                   "max-file": "5",
                   "max-size": "50m"
-              }
+              },
+              "secretOptions": []
           }
       },
       {
           "name": "web",
           "image": "${REPO_WEB}:$GIT_COMMIT",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
           "portMappings": [
               {
                   "containerPort": 4200,
@@ -113,14 +118,15 @@
               "options": {
                   "max-file": "5",
                   "max-size": "50m"
-              }
+              },
+              "secretOptions": []
           }
       },
       {
           "name": "widget",
           "image": "${REPO_WIDGET}:$GIT_COMMIT",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
           "portMappings": [
               {
                   "containerPort": 4500,
@@ -131,12 +137,12 @@
           "essential": true,
           "environment": [
               {
-                  "name": "WIDGET_CONTEXT_PATH",
-                  "value": ""
-              },
-              {
                   "name": "REACT_APP_WS_URL",
                   "value": "http://18.194.167.222:3002"
+              },
+              {
+                  "name": "WIDGET_CONTEXT_PATH",
+                  "value": ""
               },
               {
                   "name": "REACT_APP_ENVIRONMENT",
@@ -160,14 +166,15 @@
               "options": {
                   "max-file": "5",
                   "max-size": "50m"
-              }
+              },
+              "secretOptions": []
           }
       },
       {
           "name": "embed",
           "image": "${REPO_EMBED}:$GIT_COMMIT",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
           "portMappings": [
               {
                   "containerPort": 4701,
@@ -195,21 +202,22 @@
               "options": {
                   "max-file": "5",
                   "max-size": "50m"
-              }
+              },
+              "secretOptions": []
           }
       },
       {
           "name": "redis",
           "image": "redis:alpine",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
           "portMappings": [
-            {
-                "containerPort": 6379,
-                "hostPort": 6379,
-                "protocol": "tcp"
-            }
-        ],
+              {
+                  "containerPort": 6379,
+                  "hostPort": 6379,
+                  "protocol": "tcp"
+              }
+          ],
           "essential": true,
           "environment": [],
           "mountPoints": [],
@@ -226,14 +234,15 @@
                   "awslogs-group": "/docker-compose/novu",
                   "awslogs-region": "eu-central-1",
                   "awslogs-stream-prefix": "novu"
-              }
+              },
+              "secretOptions": []
           }
       },
       {
           "name": "mongodb",
           "image": "mongo",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
           "portMappings": [
               {
                   "containerPort": 27017,
@@ -272,14 +281,15 @@
                   "awslogs-group": "/docker-compose/novu",
                   "awslogs-region": "eu-central-1",
                   "awslogs-stream-prefix": "novu"
-              }
+              },
+              "secretOptions": []
           }
       },
       {
           "name": "api",
           "image": "${REPO_API}:$GIT_COMMIT",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
           "links": [
               "redis",
               "mongodb"
@@ -299,15 +309,11 @@
               },
               {
                   "name": "MONGO_URL",
-                  "value": "mongodb://18.194.167.222:27017/novu-db"
+                  "value": "mongodb://mongodb:27017/novu-db"
               },
               {
                   "name": "S3_REGION",
-                  "value": "us-east-1"
-              },
-              {
-                  "name": "AWS_SECRET_ACCESS_KEY",
-                  "value": "test"
+                  "value": "eu-central-1"
               },
               {
                   "name": "DISABLE_USER_REGISTRATION",
@@ -330,10 +336,6 @@
                   "value": "your-secret"
               },
               {
-                  "name": "AWS_ACCESS_KEY_ID",
-                  "value": "test"
-              },
-              {
                   "name": "SENTRY_DSN",
                   "value": ""
               },
@@ -351,7 +353,7 @@
               },
               {
                   "name": "API_ROOT_URL",
-                  "value": "https://dmnl-novu-dev.deptagency.com"
+                  "value": "http://18.194.167.222:3000"
               },
               {
                   "name": "APP_SELF_URL",
@@ -359,11 +361,11 @@
               },
               {
                   "name": "S3_BUCKET_NAME",
-                  "value": "novu-local"
+                  "value": "dept-novu"
               },
               {
                   "name": "FRONT_BASE_URL",
-                  "value": "http://client:4200"
+                  "value": "http://18.194.167.222:4200"
               },
               {
                   "name": "REDIS_CACHE_SERVICE_PORT",
@@ -375,7 +377,7 @@
               },
               {
                   "name": "S3_LOCAL_STACK",
-                  "value": "http://18.194.167.222:4566"
+                  "value": ""
               },
               {
                   "name": "STORE_ENCRYPTION_KEY",
@@ -394,6 +396,16 @@
                   "value": ""
               }
           ],
+          "secrets": [
+            {
+              "name": "AWS_SECRET_ACCESS_KEY",
+              "valueFrom": "/dept-notification-service/novu/aws/secret"
+            },
+            {
+              "name": "AWS_ACCESS_KEY_ID",
+              "valueFrom": "/dept-notification-service/novu/aws/key"
+            }
+          ],
           "mountPoints": [],
           "volumesFrom": [],
           "linuxParameters": {
@@ -408,14 +420,19 @@
                   "awslogs-group": "/docker-compose/novu",
                   "awslogs-region": "eu-central-1",
                   "awslogs-stream-prefix": "novu"
-              }
+              },
+              "secretOptions": []
           }
       },
       {
           "name": "worker",
           "image": "${REPO_WORKER}:$GIT_COMMIT",
           "cpu": 0,
-          "memory": 512,
+          "memoryReservation": 512,
+          "links": [
+            "redis",
+            "mongodb"
+          ],
           "portMappings": [],
           "essential": true,
           "environment": [
@@ -429,19 +446,15 @@
               },
               {
                   "name": "MONGO_URL",
-                  "value": "mongodb://18.194.167.222:27017/novu-db"
+                  "value": "mongodb://mongodb:27017/novu-db"
               },
               {
                   "name": "S3_REGION",
-                  "value": "us-east-1"
-              },
-              {
-                  "name": "AWS_SECRET_ACCESS_KEY",
-                  "value": "test"
+                  "value": "eu-central-1"
               },
               {
                   "name": "S3_BUCKET_NAME",
-                  "value": "novu-local"
+                  "value": "dept-novu"
               },
               {
                   "name": "REDIS_CACHE_SERVICE_PORT",
@@ -460,12 +473,8 @@
                   "value": "6379"
               },
               {
-                  "name": "AWS_ACCESS_KEY_ID",
-                  "value": "test"
-              },
-              {
                   "name": "S3_LOCAL_STACK",
-                  "value": "http://18.194.167.222:4566"
+                  "value": ""
               },
               {
                   "name": "SENTRY_DSN",
@@ -488,6 +497,16 @@
                   "value": ""
               }
           ],
+          "secrets": [
+            {
+              "name": "AWS_SECRET_ACCESS_KEY",
+              "valueFrom": "/dept-notification-service/novu/aws/secret"
+            },
+            {
+              "name": "AWS_ACCESS_KEY_ID",
+              "valueFrom": "/dept-notification-service/novu/aws/key"
+            }
+          ],
           "mountPoints": [],
           "volumesFrom": [],
           "linuxParameters": {
@@ -501,7 +520,8 @@
               "options": {
                   "max-file": "5",
                   "max-size": "50m"
-              }
+              },
+              "secretOptions": []
           }
       }
   ],
