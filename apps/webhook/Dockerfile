@@ -18,7 +18,7 @@ COPY ./pkg .
 
 RUN --mount=type=cache,id=pnpm-store-webhook,target=/root/.pnpm-store\
  pnpm install --reporter=silent --filter "novuhq" --filter "{${PACKAGE_PATH}}..."\
- --frozen-lockfile\
+ --no-frozen-lockfile\
  --unsafe-perm\
  --reporter=silent
 
@@ -58,7 +58,7 @@ COPY --from=assets /usr/src/app .
 
 RUN --mount=type=cache,id=pnpm-store-webhook,target=/root/.pnpm-store\
  pnpm install --reporter=silent --filter "{${PACKAGE_PATH}}..."\
- --frozen-lockfile\
+ --no-frozen-lockfile\
  --unsafe-perm\
  --reporter=silent
 
