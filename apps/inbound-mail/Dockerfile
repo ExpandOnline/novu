@@ -25,7 +25,7 @@ RUN if [ -n '${BULL_MQ_PRO_NPM_TOKEN}' ]; then cp .npmrc-cloud .npmrc; fi
 
 RUN --mount=type=cache,id=pnpm-store-inbound-mail,target=/root/.pnpm-store\
  pnpm install --reporter=silent --filter "novuhq" --filter "{${PACKAGE_PATH}}..."\
- --no-frozen-lockfile\
+ --frozen-lockfile\
  --unsafe-perm\
  --reporter=silent
 
@@ -66,7 +66,7 @@ COPY --from=assets /usr/src/app .
 
 RUN --mount=type=cache,id=pnpm-store-inbound-mail,target=/root/.pnpm-store\
  pnpm install --reporter=silent --filter "{${PACKAGE_PATH}}..."\
- --no-frozen-lockfile\
+ --frozen-lockfile\
  --unsafe-perm\
  --reporter=silent
 
