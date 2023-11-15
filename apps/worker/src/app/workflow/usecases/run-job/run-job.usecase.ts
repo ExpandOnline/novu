@@ -64,6 +64,10 @@ export class RunJob {
 
       await this.storageHelperService.getAttachments(job.payload?.attachments);
 
+      if (job.digest?.events?.length == 0) {
+        job.digest.events = [job.payload ?? {}];
+      }
+
       await this.sendMessage.execute(
         SendMessageCommand.create({
           identifier: job.identifier,

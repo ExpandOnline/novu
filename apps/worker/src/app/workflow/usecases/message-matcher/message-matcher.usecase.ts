@@ -329,7 +329,12 @@ export class MessageMatcher extends Filter {
     command: MessageMatcherCommand,
     filterProcessingDetails: FilterProcessingDetails
   ): Promise<boolean> {
-    const tz = command.job.payload.timezone;
+    const subscriber = await this.getSubscriberBySubscriberId({
+      subscriberId: command.subscriberId,
+      _environmentId: command.environmentId,
+    });
+
+    const tz = subscriber?.data?.timezone?.toString();
 
     const today = new Date().toLocaleString('en-US', { timeZone: tz, hour12: false });
     const currentHour = parseInt(today.split(',')[1].trim().split(':')[0]);
@@ -355,7 +360,13 @@ export class MessageMatcher extends Filter {
     command: MessageMatcherCommand,
     filterProcessingDetails: FilterProcessingDetails
   ): Promise<boolean> {
-    const slackMemberId = command.job.payload.slackMemberId;
+    const subscriber = await this.subscriberRepository.findOne({
+      _id: command._subscriberId,
+      _organizationId: command.organizationId,
+      _environmentId: command.environmentId,
+    });
+
+    const slackMemberId = subscriber?.data?.slackMemberId?.toString();
     const expected = filter.value;
 
     const foundIntegration = await this.integrationRepository.findOne({
@@ -370,7 +381,7 @@ export class MessageMatcher extends Filter {
 
     let isOnlineSlack = false;
 
-    if (decryptedCredentials?.apiKey) {
+    if (decryptedCredentials?.apiKey && slackMemberId) {
       const slackWebClient = getSlackWebClientInstance(decryptedCredentials?.apiKey || '');
 
       const status = await slackWebClient.users.getPresence({ user: slackMemberId });
