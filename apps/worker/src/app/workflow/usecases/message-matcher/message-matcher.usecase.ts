@@ -343,7 +343,7 @@ export class MessageMatcher extends Filter {
       field: 'isOfficeHours',
       expected: `${filter.value}`,
       actual: `${isOfficeHours}`,
-      operator: 'EQUAL',
+      operator: FieldOperatorEnum.EQUAL,
       passed: passed,
     });
 
@@ -384,7 +384,7 @@ export class MessageMatcher extends Filter {
       field: 'isOnlineSlack',
       expected: `${filter.value}`,
       actual: `${isOnlineSlack}`,
-      operator: 'EQUAL',
+      operator: FieldOperatorEnum.EQUAL,
       passed: passed,
     });
 
