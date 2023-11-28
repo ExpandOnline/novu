@@ -7,6 +7,7 @@ import {
   IWebhookFilterPart,
   IRealtimeOnlineFilterPart,
   IOnlineInLastFilterPart,
+  FieldLogicalOperatorEnum,
   IIsOfficeHours,
   IIsOnlineSlack,
   FILTER_TO_LABEL,
@@ -18,6 +19,7 @@ import {
   PreviousStepTypeEnum,
   ExecutionDetailsSourceEnum,
   ExecutionDetailsStatusEnum,
+  FieldOperatorEnum,
   ICredentials,
 } from '@novu/shared';
 import {
@@ -183,7 +185,7 @@ export class MessageMatcher extends Filter {
     command: MessageMatcherCommand,
     filterProcessingDetails: FilterProcessingDetails
   ): Promise<boolean> {
-    if (filter.value === 'OR') {
+    if (filter.value === FieldLogicalOperatorEnum.OR) {
       return await this.handleOrFilters(filter, variables, command, filterProcessingDetails);
     }
 
@@ -277,7 +279,7 @@ export class MessageMatcher extends Filter {
     const label = FILTER_TO_LABEL[filter.on];
     const field = filter.stepType;
     const expected = 'true';
-    const operator = 'EQUAL';
+    const operator = FieldOperatorEnum.EQUAL;
 
     if (message?.channel === ChannelTypeEnum.EMAIL) {
       const count = await this.executionDetailsRepository.count({
@@ -327,7 +329,12 @@ export class MessageMatcher extends Filter {
     command: MessageMatcherCommand,
     filterProcessingDetails: FilterProcessingDetails
   ): Promise<boolean> {
-    const tz = command.job.payload.timezone;
+    const subscriber = await this.getSubscriberBySubscriberId({
+      subscriberId: command.subscriberId,
+      _environmentId: command.environmentId,
+    });
+
+    const tz = subscriber?.data?.timezone?.toString();
 
     const today = new Date().toLocaleString('en-US', { timeZone: tz, hour12: false });
     const currentHour = parseInt(today.split(',')[1].trim().split(':')[0]);
@@ -341,7 +348,7 @@ export class MessageMatcher extends Filter {
       field: 'isOfficeHours',
       expected: `${filter.value}`,
       actual: `${isOfficeHours}`,
-      operator: 'EQUAL',
+      operator: FieldOperatorEnum.EQUAL,
       passed: passed,
     });
 
@@ -353,7 +360,13 @@ export class MessageMatcher extends Filter {
     command: MessageMatcherCommand,
     filterProcessingDetails: FilterProcessingDetails
   ): Promise<boolean> {
-    const slackMemberId = command.job.payload.slackMemberId;
+    const subscriber = await this.subscriberRepository.findOne({
+      _id: command._subscriberId,
+      _organizationId: command.organizationId,
+      _environmentId: command.environmentId,
+    });
+
+    const slackMemberId = subscriber?.data?.slackMemberId?.toString();
     const expected = filter.value;
 
     const foundIntegration = await this.integrationRepository.findOne({
@@ -368,7 +381,7 @@ export class MessageMatcher extends Filter {
 
     let isOnlineSlack = false;
 
-    if (decryptedCredentials?.apiKey) {
+    if (decryptedCredentials?.apiKey && slackMemberId) {
       const slackWebClient = getSlackWebClientInstance(decryptedCredentials?.apiKey || '');
 
       const status = await slackWebClient.users.getPresence({ user: slackMemberId });
@@ -382,7 +395,7 @@ export class MessageMatcher extends Filter {
       field: 'isOnlineSlack',
       expected: `${filter.value}`,
       actual: `${isOnlineSlack}`,
-      operator: 'EQUAL',
+      operator: FieldOperatorEnum.EQUAL,
       passed: passed,
     });
 
@@ -395,7 +408,7 @@ export class MessageMatcher extends Filter {
     filterProcessingDetails: FilterProcessingDetails
   ): Promise<boolean> {
     const subscriber = await this.subscriberRepository.findOne({
-      _id: command.subscriberId,
+      _id: command._subscriberId,
       _organizationId: command.organizationId,
       _environmentId: command.environmentId,
     });
@@ -411,7 +424,7 @@ export class MessageMatcher extends Filter {
         field: 'isOnline',
         expected: `${filter.value}`,
         actual: `${filter.on === FilterPartTypeEnum.IS_ONLINE ? isOnlineString : lastOnlineAtString}`,
-        operator: filter.on === FilterPartTypeEnum.IS_ONLINE ? 'EQUAL' : filter.timeOperator,
+        operator: filter.on === FilterPartTypeEnum.IS_ONLINE ? FieldOperatorEnum.EQUAL : filter.timeOperator,
         passed: false,
       });
 
@@ -425,7 +438,7 @@ export class MessageMatcher extends Filter {
         field: 'isOnline',
         expected: `${filter.value}`,
         actual: isOnlineString,
-        operator: 'EQUAL',
+        operator: FieldOperatorEnum.EQUAL,
         passed: isOnlineMatch,
       });
 

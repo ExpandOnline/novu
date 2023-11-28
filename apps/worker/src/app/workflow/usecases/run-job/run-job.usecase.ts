@@ -31,7 +31,7 @@ export class RunJob {
       environmentId: command.environmentId,
     });
 
-    const job = await this.jobRepository.findById(command.jobId);
+    const job = await this.jobRepository.findOne({ _id: command.jobId, _environmentId: command.environmentId });
     if (!job) throw new PlatformException(`Job with id ${command.jobId} not found`);
 
     try {
@@ -63,6 +63,10 @@ export class RunJob {
       await this.jobRepository.updateStatus(job._environmentId, job._id, JobStatusEnum.RUNNING);
 
       await this.storageHelperService.getAttachments(job.payload?.attachments);
+
+      if (job.digest?.events?.length == 0) {
+        job.digest.events = [job.payload ?? {}];
+      }
 
       await this.sendMessage.execute(
         SendMessageCommand.create({
